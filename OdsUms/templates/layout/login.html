@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+{% extends "master_beforelogin.html" %}
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-sm-4 col-sm-offset-4" style="text-align: center">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-4 col-sm-offset-4 well">
+            <form action="/signin" method="post">
+                <div class="form-group">
+                    <input type="text" class="form-control" id="username" name="username" placeholder="用户名">
+                </div>
+                <div class="form-group">
+                    <input type="password" class="form-control" id="password" name="password" placeholder="密码">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">Sign In</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

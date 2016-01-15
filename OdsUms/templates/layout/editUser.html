@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+{% extends "master_base.html" %}
+{% block content %}
+<script type="text/javascript" src="../../static/knockout/dist/knockout.js"></script>
+<div>
+    <fieldset>
+        <legend>edit user information</legend>
+        <div class="mainDiv1" style="width: 30%; float: left; padding-left: 5%" >
+        <div class="basicInfoList" style="width: 100%">
+            <div class="div0" style="padding-left: 2%">
+            <div class="control-group">
+
+            <label class="control-label" for="username">username</label>
+            <div class="controls">
+                <input type="text" class="form-control" name="username" id="username" data-bind="value: username">
+            </div>
+
+            <label class="control-label" for="password">password</label>
+            <div class="controls">
+
+                <input type="text" class="form-control" name="password" id="password" data-bind="value: password">
+
+                <a href="#" data-bind="click: randomPassword">generate</a>
+            </div>
+
+            <label class="control-label" for="memo">memo</label>
+            <div class="controls">
+                <input type="text" class="form-control" name="memo" id="memo" data-bind="value: memo">
+            </div>
+
+            <label class="control-label" for="expire_time">expire time</label>
+            <div class="controls">
+                <input type="date" class="form-control" name="expire_time" id="expire_time" data-bind="value: expire_time">
+            </div>
+
+            </div>
+
+            </div>
+        </div>
+
+            <div class="submitDiv" style="padding-left: 2%; padding-top: 20px">
+                <div class="form-actions">
+                    <button id="sub" class="btn btn-primary btn-large" data-bind="click: submit">save</button>
+                    <button id="can" class="btn btn-primary btn-large" data-bind="click: cancel">cancel</button>
+                </div>
+            </div>
+        </div>
+        <div class="mainDiv2" style="width: 50%; float: left">
+            <div class="addEntitlement" style="float: left; padding-left: 10%">
+                <form data-bind="submit: addEntitlement">
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <th>symbol</th>
+                            <th>start time</th>
+                            <th>end time</th>
+                            <th>operation</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                            <td><input type="text" data-bind="value: newSymbol"/></td>
+                            <td><input type="date" data-bind="value: newStart"/></td>
+                            <td><input type="date" data-bind="value: newEnd"/></td>
+                            <td><button type="submit">add</button> </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </form>
+            </div>
+        <div class="entitlementInfoList" style="width: 50% ; float: left; padding-left: 10%">
+
+            <table class="table table-bordered" id="entitlement">
+                <thead>
+                <tr>
+                    <th>symbol</th>
+                    <th>start time</th>
+                    <th>end time</th>
+                    <th>operation</th>
+                </tr>
+                </thead>
+                <tbody data-bind="foreach: entitlementArray">
+                <tr>
+                    <td><input type="text"  data-bind="value: symbol"/></td>
+                    <td><input type="date"  data-bind="value: start_time"/></td>
+                    <td><input type="date"  data-bind="value: end_time"/></td>
+                    <td><a href="#" data-bind="click: $root.remove">remove</a></td>
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+        </div>
+
+    </fieldset>
+
+
+    <span id="entitlementInfo" style="visibility: hidden">{{entitlementInfo | tojson |safe}}</span>
+    <span id="userInfo" style="visibility: hidden">{{userInfo | tojson |safe}}</span>
+
+</div>
+
+
+
+
+<div class="div2" style=" float: left; padding-left: 10%" >
+    <table class="table table-bordered" id="log">
+        <thead>
+        <tr>
+            <th>staff id</th>
+            <th>operation time</th>
+            <th>operation type</th>
+            <th>modification</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for item in log %}
+        <tr>
+            <td><span>{{item.staff_name}}</span></td>
+            <td><span>{{item.operation_time}}</span></td>
+            <td><span>{{item.operation_type}}</span></td>
+            <td><span>{{item.modification}}</span></td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<script type="text/javascript" src="../../static/jquery/jquery.min.js"></script>
+<script type="text/javascript" src="../../static/editUser.js"></script>
+<script language="javascript" type="text/javascript" src="../../static/tableSorter.js"></script>
+<script language="javascript" type="text/javascript">
+    window.onload = function()
+    {
+        new TableSorter("log");
+        {
+        //alert("table is sorted by " + c.innerHTML + " " + (t ? "Asc" : "Desc"));
+        }
+    }
+</script>
+{% endblock %}
