@@ -3,6 +3,7 @@ __author__ = 'ty'
 import unittest
 from OdsUms.controller import LoginController, AddUserController, GetAllUserController, getOneUserController
 
+
 class TestLoginController(unittest.TestCase):
     def test_init(self):
         login = LoginController("paul", "123456")

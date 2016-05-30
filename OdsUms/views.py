@@ -13,13 +13,16 @@ from forms import LoginForm
 from OdsUms import models, app, lm
 from controller import LoginController, AddUserController, GetAllUserController, UpdateUserController, GetOneUserController
 
+
 @lm.user_loader
 def load_user(username):
     return Admin.query.filter(Admin.username == username).first()
 
+
 @app.route('/', methods=['GET'])
 def login_input():
     return render_template('/layout/login.html')
+
 
 @app.route('/signin',methods=['POST'])
 def login():
@@ -31,28 +34,32 @@ def login():
     else:
         return redirect("/")
 
+
 @app.route("/userList", methods=['GET','POST'])
-@login_required
+# @login_required
 def welcome():
     if request.method == "GET":
         getUser=GetAllUserController()
         user_collection = getUser.getUserInfo()
-        return render_template('/layout/userList.html', name=g.user.username, user_collection=user_collection)
+        return render_template('/layout/userList.html', name='hi', user_collection=user_collection)
     if request.method == "POST":
         pass
 
+
 @app.route("/logout")
-@login_required
+# @login_required
 def logout():
     logout_user()
     return redirect("/")
+
 
 @app.before_request
 def before_request():
     g.user = current_user
 
+
 @app.route("/userList/<int:user_id>",methods=['GET', 'POST'])
-@login_required
+# @login_required
 def userBasicInfoEdit(user_id):
     if request.method == 'GET':
         getUser = GetOneUserController()
@@ -77,8 +84,9 @@ def userBasicInfoEdit(user_id):
             flash('Fail!')
             return redirect('/welcome/bad')'''
 
+
 @app.route("/userList/addUser", methods=['GET','POST'])
-@login_required
+# @login_required
 def addUser():
     if request.method == 'GET':
         return render_template('/layout/addUser.html')
