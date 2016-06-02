@@ -1,17 +1,16 @@
-__author__ = 'ty'
-
-from sqlalchemy import Column, String
-from sqlalchemy.ext.declarative import declarative_base
-from passlib.context import CryptContext
-from sqlalchemy.orm import sessionmaker
-from passlib.handlers.pbkdf2 import pbkdf2_sha512
 from passlib.apps import custom_app_context as pwd_context
 from flask_login import UserMixin
-from OdsUms import db
-import json
+
+from . import login_manager, db
+
+
+@login_manager.user_loader
+def load_user(username):
+    return Admin.query.filter(Admin.username == username).first()
+
 
 class Admin(db.Model, UserMixin):
-    __tablename__='admin'
+    __tablename__ = 'admin'
     user_id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20))
     password = db.Column(db.String(100))
@@ -35,7 +34,8 @@ class Admin(db.Model, UserMixin):
         return self.username
 
     def __repr__(self):
-        return super(User, self).__repr__()
+        return super(Admin, self).__repr__()
+
 
 class User(db.Model, UserMixin):
     __tablename__='user'
@@ -59,13 +59,14 @@ class User(db.Model, UserMixin):
         dicList.append(dic)
         return dicList
 
+
 class Entitlement(db.Model):
-    __tablename__='entitlement'
+    __tablename__ = 'entitlement'
     entitlement_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer)
     start_time = db.Column(db.Date)
     end_time = db.Column(db.Date)
-    #tentative
+    # tentative
     entitlement = db.Column(db.String(10))
 
     def __init__(self, user_id, entitlement, start_time, end_time):
@@ -76,6 +77,7 @@ class Entitlement(db.Model):
 
     def __str__(self):
         return "symbol: "+ str(self.entitlement) + "  start: " + str(self.start_time) + "  end: " + str(self.end_time)
+
 
 class Log(db.Model):
     __tablename__ = 'log'

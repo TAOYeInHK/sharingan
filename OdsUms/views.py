@@ -1,22 +1,8 @@
-__author__ = 'ty'
+from flask import request, render_template, redirect, g, flash
+from flask_login import login_required, logout_user, current_user
 
-from flask import request, render_template, redirect, g , url_for, flash
-from models import Admin, User, Entitlement
-
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
-from passlib.handlers.pbkdf2 import pbkdf2_sha512
-import json
-from flask_login import login_required,login_user,logout_user,current_user
-from forms import LoginForm
-from OdsUms import models, app, lm
-from controller import LoginController, AddUserController, GetAllUserController, UpdateUserController, GetOneUserController
-
-
-@lm.user_loader
-def load_user(username):
-    return Admin.query.filter(Admin.username == username).first()
+from . import app
+from .controller import LoginController, AddUserController, GetAllUserController, UpdateUserController, GetOneUserController
 
 
 @app.route('/', methods=['GET'])
@@ -28,26 +14,22 @@ def login_input():
 def login():
     username = request.form['username']
     password = request.form['password']
-    control = LoginController(username, password)
-    if control.authenticate():
+    if LoginController.authenticate(username, password):
         return redirect("/userList")
     else:
         return redirect("/")
 
 
-@app.route("/userList", methods=['GET','POST'])
-# @login_required
+@app.route("/userList", methods=['GET'])
+@login_required
 def welcome():
-    if request.method == "GET":
-        getUser=GetAllUserController()
-        user_collection = getUser.getUserInfo()
-        return render_template('/layout/userList.html', name='hi', user_collection=user_collection)
-    if request.method == "POST":
-        pass
+    getUser = GetAllUserController()
+    user_collection = getUser.getUserInfo()
+    return render_template('/layout/userList.html', name='hi', user_collection=user_collection)
 
 
 @app.route("/logout")
-# @login_required
+@login_required
 def logout():
     logout_user()
     return redirect("/")
@@ -58,8 +40,8 @@ def before_request():
     g.user = current_user
 
 
-@app.route("/userList/<int:user_id>",methods=['GET', 'POST'])
-# @login_required
+@app.route("/userList/<int:user_id>", methods=['GET', 'POST'])
+@login_required
 def userBasicInfoEdit(user_id):
     if request.method == 'GET':
         getUser = GetOneUserController()
@@ -85,8 +67,8 @@ def userBasicInfoEdit(user_id):
             return redirect('/welcome/bad')'''
 
 
-@app.route("/userList/addUser", methods=['GET','POST'])
-# @login_required
+@app.route("/userList/addUser", methods=['GET', 'POST'])
+@login_required
 def addUser():
     if request.method == 'GET':
         return render_template('/layout/addUser.html')

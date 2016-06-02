@@ -1,28 +1,26 @@
-__author__ = 'ty'
-from passlib.apps import custom_app_context as pwd_context
-from passlib.handlers.pbkdf2 import pbkdf2_sha512
-from OdsUms.models import Admin,User,Entitlement, Log
-from flask_login import login_user
-from OdsUms import db
 import re
 import json
 import time
 import datetime
 
+from flask_login import login_user
+from passlib.apps import custom_app_context as pwd_context
 
-class LoginController():
-    def __init__(self,username, password):
-        self.username = username
-        self.password = password
-    def authenticate(self):
-        return True
-        # admin = Admin.query.filter(Admin.username == self.username).first()
-        # admin = db.engine.execute('select password from admin where username=%s' % self.username)
-        # if admin is not None and pwd_context.verify(self.password, admin.password):
-        #     login_user(admin)
-        #     return True
-        # else:
-        #     return False
+from . import db
+from .models import Admin, User, Entitlement, Log
+
+
+class LoginController(object):
+
+    @classmethod
+    def authenticate(cls, username, password):
+        admin = Admin.query.filter_by(username=username).first()
+        if admin is not None and pwd_context.verify(password, admin.password):
+            login_user(admin)
+            return True
+        else:
+            return False
+
 
 class AddUserController():
     def __init__(self, username, password, memo, expire_time, staff_id):
