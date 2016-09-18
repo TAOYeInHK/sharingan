@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 from passlib.apps import custom_app_context as pwd_context
 from flask_login import UserMixin
 
@@ -6,7 +7,7 @@ from . import login_manager, db
 
 @login_manager.user_loader
 def load_user(username):
-    return Admin.query.filter(Admin.username == username).first()
+    return Admin.query.filter_by(username=username).first()
 
 
 class Admin(db.Model, UserMixin):
@@ -38,8 +39,8 @@ class Admin(db.Model, UserMixin):
 
 
 class User(db.Model, UserMixin):
-    __tablename__='user'
-    user_id =db.Column(db.Integer, primary_key=True)
+    __tablename__ = 'user'
+    user_id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20))
     password = db.Column(db.String(100))
     memo = db.Column(db.String(66000))
@@ -51,10 +52,10 @@ class User(db.Model, UserMixin):
         self.memo = memo
         self.expire_time = expire_time
 
-    def toJson(self):
-        dic = {"user_id": self.user_id, "username": self.username,
-               "password":self.password, "memo": self.memo,
-               "expire_time": str(self.expire_time)}
+    def to_json(self):
+        dic = {'user_id': self.user_id, 'username': self.username,
+               'password': self.password, 'memo': self.memo,
+               'expire_time': str(self.expire_time)}
         dicList = []
         dicList.append(dic)
         return dicList

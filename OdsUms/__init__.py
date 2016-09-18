@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 __author__ = 'ty'
 from flask import Flask
 from flask_login import LoginManager

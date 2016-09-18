@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 import re
 import json
 import time
@@ -22,23 +23,24 @@ class LoginController(object):
             return False
 
 
-class AddUserController():
+class AddUserController(object):
     def __init__(self, username, password, memo, expire_time, staff_id):
         self.username = username
         self.password = password
         self.memo = memo
         self.expire_time = expire_time
         self.staff_id = staff_id
-    def usernameValidation(self):
+
+    def is_valid_username(self):
         username_pattern = r'^[a-zA-Z0-9@._-]{1,20}$'
-        match = re.match(username_pattern,self.username)
+        match = re.match(username_pattern, self.username)
         if match:
             return True
         else:
             print "invalid username"
             return False
 
-    def passwordValidation(self):
+    def is_valid_password(self):
         password_pattern = r'^.{1,64}$'
         match = re.match(password_pattern,self.password)
         if match:
@@ -47,28 +49,30 @@ class AddUserController():
             print "invalid password"
             return False
 
-    def memoValidation(self):
+    def is_valid_memo(self):
         if len(self.memo) < 65535:
             return True
         else:
             print "invalid memo"
             return False
 
-    def addUser(self):
-        current_time = time.strftime('%Y-%m-%d %H:%M:%S',time.localtime(time.time()))
+    def add_user(self):
+        current_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
         if len(str(self.expire_time)) == 0:
             self.expire_time = None
         user = User(self.username, self.password, self.memo, self.expire_time)
         db.session.add(user)
         db.session.commit()
-        user_temp = User.query.filter(User.username == self.username).first()
-        log = Log(user_temp.user_id, self.staff_id, current_time, "CreateAccount", "", "")
+        user = User.query.filter_by(username=self.username).first()
+        log = Log(user.user_id, self.staff_id, current_time, "CreateAccount", "", "")
         db.session.add(log)
         db.session.commit()
-        return True
 
-class GetAllUserController():
-    def getUserInfo(self):
+
+class GetAllUserController(object):
+
+    @classmethod
+    def get_user_list(cls):
         userCollection = []
         result = db.engine.execute('Select user.user_id, user.username, user.password, '
                                    'user.memo, user.expire_time, tempEntitle.NumOfEntitle '
@@ -99,10 +103,13 @@ class GetAllUserController():
             userCollection.append(user_tuple)
         return userCollection
 
-class GetOneUserController():
-    def getUserInfo(self, user_id):
+
+class GetOneUserController(object):
+
+    def get_user(self, user_id):
         user = User.query.filter(User.user_id == user_id).first()
-        return user.toJson()
+        return user.to_json()
+
     def getUserInfoByName(self, username):
         user = User.query.filter(User.username == username).all()
         userList =[]
@@ -168,7 +175,7 @@ class GetOneUserController():
 
 
 
-class UpdateUserController():
+class UpdateUserController(object):
     def __init__(self, user_id, staff_id=None):
         self.user_id = user_id
         self.staff_id = staff_id
@@ -273,6 +280,7 @@ class UpdateUserController():
                 db.session.add(log)
                 db.session.commit()
         return True
+
 
 # add new admin
 def new_user(username, password, apiKey):

@@ -8,7 +8,7 @@ from authentication import auth
 
 
 @api.route("/user/<username>")
-@auth.login_required
+# @auth.login_required
 def retrieveInfo(username=None):
     control = GetOneUserController()
     userList = control.getUserInfoByName(username)
@@ -17,9 +17,11 @@ def retrieveInfo(username=None):
     else:
         return control.infoToJson(userList)
 
+
 @api.route("/hello")
 def show():
     return jsonify({"hello": "hello Paul"})
+
 
 @api.route("/test")
 def test():

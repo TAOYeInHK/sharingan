@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 from flask import request, render_template, redirect, g, flash
 from flask_login import login_required, logout_user, current_user
 
@@ -5,12 +6,17 @@ from . import app
 from .controller import LoginController, AddUserController, GetAllUserController, UpdateUserController, GetOneUserController
 
 
+@app.before_request
+def before_request():
+    g.user = current_user
+
+
 @app.route('/', methods=['GET'])
 def login_input():
     return render_template('/layout/login.html')
 
 
-@app.route('/signin',methods=['POST'])
+@app.route('/signin', methods=['POST'])
 def login():
     username = request.form['username']
     password = request.form['password']
@@ -24,8 +30,8 @@ def login():
 @login_required
 def welcome():
     getUser = GetAllUserController()
-    user_collection = getUser.getUserInfo()
-    return render_template('/layout/userList.html', name='hi', user_collection=user_collection)
+    user_collection = getUser.get_user_list()
+    return render_template('/layout/user_list.html', name='hi', user_collection=user_collection)
 
 
 @app.route("/logout")
@@ -35,20 +41,15 @@ def logout():
     return redirect("/")
 
 
-@app.before_request
-def before_request():
-    g.user = current_user
-
-
 @app.route("/userList/<int:user_id>", methods=['GET', 'POST'])
 @login_required
-def userBasicInfoEdit(user_id):
+def edit(user_id):
     if request.method == 'GET':
         getUser = GetOneUserController()
-        user = getUser.getUserInfo(user_id)
+        user = getUser.get_user(user_id)
         entitlement = getUser.getUserEntitlement(user_id)
         log = getUser.getLog(user_id)
-        return render_template('/layout/editUser.html', userInfo=user,
+        return render_template('/layout/edit.html', userInfo=user,
                                entitlementInfo=entitlement, log=log)
 
     if request.method == 'POST':
@@ -60,26 +61,26 @@ def userBasicInfoEdit(user_id):
         deletedEntitlement = request.json['deletedEntitlement']
         update = UpdateUserController(user_id, g.user.user_id)
         if update.updateUserInfo(username, password, memo, expire_time, modifiedEntitlement, deletedEntitlement):
-            flash('Success!')
             return redirect('/userList')
-        '''else:
+        else:
             flash('Fail!')
-            return redirect('/welcome/bad')'''
+            return redirect('/welcome/bad')
 
 
 @app.route("/userList/addUser", methods=['GET', 'POST'])
 @login_required
-def addUser():
+def add():
     if request.method == 'GET':
-        return render_template('/layout/addUser.html')
+        return render_template('/layout/add.html')
     if request.method == 'POST':
         username = request.json['username']
         password = request.json['password']
         memo = request.json['memo']
         expire_time = request.json['expire_time']
         add_user = AddUserController(username, password, memo, expire_time, g.user.user_id)
-        if add_user.addUser():
+        try:
+            add_user.add_user()
+        except Exception:
             return "True"
         else:
-            flash('Fail!')
             return redirect('/userList/addUser')
