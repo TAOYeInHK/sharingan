@@ -1,14 +1,19 @@
 # -*- coding:utf-8 -*-
-from flask import request, render_template, redirect, g, flash
-from flask_login import login_required, logout_user, current_user
 
-from . import app
-from .controller import (
-    LoginController, AddUserController,
+from passlib.apps import custom_app_context
+from flask import request, render_template, redirect, g, flash
+from flask_login import login_required, logout_user, current_user, login_user
+
+from ums import app
+from ums.controller import (
+    AddUserController,
     GetAllUserController, UpdateUserController,
     GetOneUserController
 )
-from OdsUms.forms import LoginForm
+
+
+from ums.models import Admin
+from ums.forms import LoginForm
 
 
 @app.before_request
@@ -16,27 +21,23 @@ def before_request():
     g.user = current_user
 
 
-@app.route('/', methods=['GET'])
+@app.route('/login', methods=['GET', 'POST'])
 def login_input():
-    return render_template('/layout/login.html')
-
-
-@app.route('/signin', methods=['POST'])
-def login():
     form = LoginForm()
+    if request.method == 'GET':
+        return render_template('/layout/login.html', form=form)
     if not form.validate_on_submit():
         return redirect('/')
-
-    username = form.username.data
-    password = form.password.data
-
-    if LoginController.authenticate(username, password):
-        return redirect("/userList")
+    admin = Admin.query.filter_by(username=form.username).first()
+    if admin and custom_app_context.verify(
+            secret=form.password, hash=admin.password):
+        login_user(admin)
+        return redirect('/')
     else:
-        return redirect("/")
+        return redirect('/login')
 
 
-@app.route("/userList", methods=['GET'])
+@app.route('/', methods=['GET'])
 @login_required
 def welcome():
     getUser = GetAllUserController()

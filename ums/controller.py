@@ -7,8 +7,8 @@ import datetime
 from flask_login import login_user
 from passlib.apps import custom_app_context as pwd_context
 
-from . import db
-from .models import Admin, User, Entitlement, Log
+from ums.database import db
+from ums.models import Admin, User, Entitlement, Log
 
 
 class LoginController(object):

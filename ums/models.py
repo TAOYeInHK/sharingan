@@ -2,12 +2,7 @@
 from passlib.apps import custom_app_context as pwd_context
 from flask_login import UserMixin
 
-from . import login_manager, db
-
-
-@login_manager.user_loader
-def load_user(username):
-    return Admin.query.filter_by(username=username).first()
+from ums.database import db
 
 
 class Admin(db.Model, UserMixin):
