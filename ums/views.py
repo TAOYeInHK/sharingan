@@ -3,7 +3,12 @@ from flask import request, render_template, redirect, g, flash
 from flask_login import login_required, logout_user, current_user
 
 from . import app
-from .controller import LoginController, AddUserController, GetAllUserController, UpdateUserController, GetOneUserController
+from .controller import (
+    LoginController, AddUserController,
+    GetAllUserController, UpdateUserController,
+    GetOneUserController
+)
+from OdsUms.forms import LoginForm
 
 
 @app.before_request
@@ -18,8 +23,13 @@ def login_input():
 
 @app.route('/signin', methods=['POST'])
 def login():
-    username = request.form['username']
-    password = request.form['password']
+    form = LoginForm()
+    if not form.validate_on_submit():
+        return redirect('/')
+
+    username = form.username.data
+    password = form.password.data
+
     if LoginController.authenticate(username, password):
         return redirect("/userList")
     else:

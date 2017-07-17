@@ -22,20 +22,8 @@ class Admin(db.Model, UserMixin):
         self.password = pwd_context.encrypt(password)
         self.apiKey = apiKey
 
-    def is_authenticated(self):
-        return True
-
-    def is_active(self):
-        return True
-
-    def is_anonymous(self):
-        return False
-
     def get_id(self):
         return self.username
-
-    def __repr__(self):
-        return super(Admin, self).__repr__()
 
 
 class User(db.Model, UserMixin):
@@ -44,7 +32,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(20))
     password = db.Column(db.String(100))
     memo = db.Column(db.String(66000))
-    expire_time = db.Column(db.Date)
+    expire_time = db.Column(db.DateTime)
 
     def __init__(self, username, password, memo, expire_time):
         self.username = username

@@ -12,7 +12,6 @@ from .models import Admin, User, Entitlement, Log
 
 
 class LoginController(object):
-
     @classmethod
     def authenticate(cls, username, password):
         admin = Admin.query.filter_by(username=username).first()
@@ -37,7 +36,6 @@ class AddUserController(object):
         if match:
             return True
         else:
-            print "invalid username"
             return False
 
     def is_valid_password(self):
@@ -46,14 +44,12 @@ class AddUserController(object):
         if match:
             return True
         else:
-            print "invalid password"
             return False
 
     def is_valid_memo(self):
         if len(self.memo) < 65535:
             return True
         else:
-            print "invalid memo"
             return False
 
     def add_user(self):
@@ -268,7 +264,6 @@ class UpdateUserController(object):
                 pass
 
         for item in json.loads(deletedEntitlement):
-            print item["entitlement_id"] == ""
             if item["entitlement_id"] != "":
                 db.session.query(Entitlement).filter(Entitlement.entitlement_id == item["entitlement_id"]).delete()
                 db.session.commit()
