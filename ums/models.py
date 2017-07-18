@@ -1,4 +1,6 @@
 # -*- coding:utf-8 -*-
+import datetime
+
 from passlib.apps import custom_app_context as pwd_context
 from flask_login import UserMixin
 
@@ -7,27 +9,37 @@ from ums.database import db
 
 class Admin(db.Model, UserMixin):
     __tablename__ = 'admin'
-    user_id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20))
-    password = db.Column(db.String(100))
-    apiKey = db.Column(db.String(100))
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    username = db.Column(db.String(100), unique=True)
+    password = db.Column(db.String(300))
+    api_key = db.Column(db.String(100), nullable=True)
 
     def __init__(self, username, password, apiKey):
         self.username = username
         self.password = pwd_context.encrypt(password)
-        self.apiKey = apiKey
+        self.api_key = apiKey
 
-    def get_id(self):
-        return self.username
+
+records = db.Table(
+    'records',
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
+    db.Column('entitle_id', db.Integer, db.ForeignKey('entitlement.id')),
+    db.Column('start_time', db.DateTime),
+    db.Column('end_time', db.DateTime),
+)
 
 
 class User(db.Model, UserMixin):
     __tablename__ = 'user'
-    user_id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(20))
-    password = db.Column(db.String(100))
-    memo = db.Column(db.String(66000))
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    username = db.Column(db.String(100), unique=True)
+    password = db.Column(db.String(300))
+    memo = db.Column(db.String(1000))
     expire_time = db.Column(db.DateTime)
+    entitlements = db.relationship(
+        'Entitlement', secondary=records,
+        backref=db.backref('users', lazy='dynamic')
+    )
 
     def __init__(self, username, password, memo, expire_time):
         self.username = username
@@ -36,22 +48,17 @@ class User(db.Model, UserMixin):
         self.expire_time = expire_time
 
     def to_json(self):
-        dic = {'user_id': self.user_id, 'username': self.username,
-               'password': self.password, 'memo': self.memo,
-               'expire_time': str(self.expire_time)}
-        dicList = []
-        dicList.append(dic)
-        return dicList
+        return [{
+            'user_id': self.user_id, 'username': self.username,
+            'password': self.password, 'memo': self.memo,
+            'expire_time': str(self.expire_time),
+        }]
 
 
 class Entitlement(db.Model):
     __tablename__ = 'entitlement'
-    entitlement_id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer)
-    start_time = db.Column(db.Date)
-    end_time = db.Column(db.Date)
-    # tentative
-    entitlement = db.Column(db.String(10))
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(100))
 
     def __init__(self, user_id, entitlement, start_time, end_time):
         self.user_id = user_id
@@ -59,24 +66,20 @@ class Entitlement(db.Model):
         self.start_time = start_time
         self.end_time = end_time
 
-    def __str__(self):
-        return "symbol: "+ str(self.entitlement) + "  start: " + str(self.start_time) + "  end: " + str(self.end_time)
-
 
 class Log(db.Model):
     __tablename__ = 'log'
-    log_id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer)
-    staff_id = db.Column(db.Integer)
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    admin_id = db.Column(db.Integer, db.ForeignKey('admin.id'))
     operation_type = db.Column(db.String(100))
-    operation_time = db.Column(db.DateTime)
+    operation_time = db.Column(db.DateTime, default=datetime.datetime.now)
     data_field = db.Column(db.String(100))
     modification = db.Column(db.String(100))
 
-    def __init__(self, user_id, staff_id, operation_time, operation_type, data_field, modification):
+    def __init__(self, user_id, admin_id, operation_type, data_field, modification):
         self.user_id = user_id
-        self.staff_id = staff_id
+        self.admin_id = admin_id
         self.modification = modification
-        self.operation_time = operation_time
         self.operation_type = operation_type
         self.data_field = data_field

@@ -7,5 +7,5 @@ from wtforms.widgets import TextInput, PasswordInput
 
 
 class LoginForm(FlaskForm):
-    username = StringField('username', validators=[DataRequired()], widget=TextInput())
-    password = PasswordField('password', validators=[DataRequired()], widget=PasswordInput())
+    username = StringField('username', widget=TextInput())
+    password = PasswordField('password', widget=PasswordInput())

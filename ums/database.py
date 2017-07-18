@@ -2,9 +2,12 @@
 from contextlib import contextmanager
 
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 from ums import app
+
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 Session = db.sessionmaker()
 
 

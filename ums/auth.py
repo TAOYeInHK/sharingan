@@ -17,5 +17,5 @@ def unauthorized_callback():
 
 
 @login_manager.user_loader
-def load_user(name):
-    return Admin.query.filter(username=name).one()
+def load_user(admin_id):
+    return Admin.query.filter_by(id=admin_id).one()

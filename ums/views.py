@@ -10,8 +10,6 @@ from ums.controller import (
     GetAllUserController, UpdateUserController,
     GetOneUserController
 )
-
-
 from ums.models import Admin
 from ums.forms import LoginForm
 
@@ -23,33 +21,34 @@ def before_request():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login_input():
-    form = LoginForm()
+    if current_user.is_authenticated:
+        return redirect('/')
+
+    form = LoginForm(request.form)
     if request.method == 'GET':
         return render_template('/layout/login.html', form=form)
     if not form.validate_on_submit():
         return redirect('/')
-    admin = Admin.query.filter_by(username=form.username).first()
+    admin = Admin.query.filter_by(username=form.username.data).first()
     if admin and custom_app_context.verify(
-            secret=form.password, hash=admin.password):
+            secret=form.password.data, hash=admin.password):
         login_user(admin)
         return redirect('/')
     else:
         return redirect('/login')
 
 
-@app.route('/', methods=['GET'])
-@login_required
-def welcome():
-    getUser = GetAllUserController()
-    user_collection = getUser.get_user_list()
-    return render_template('/layout/user_list.html', name='hi', user_collection=user_collection)
-
-
-@app.route("/logout")
+@app.route('/logout')
 @login_required
 def logout():
     logout_user()
-    return redirect("/")
+    return redirect('/login')
+
+
+@app.route('/', methods=['GET'])
+@login_required
+def welcome():
+    return render_template('/layout/user_list.html', name='hi', user_collection=[])
 
 
 @app.route("/userList/<int:user_id>", methods=['GET', 'POST'])

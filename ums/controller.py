@@ -60,7 +60,7 @@ class AddUserController(object):
         db.session.add(user)
         db.session.commit()
         user = User.query.filter_by(username=self.username).first()
-        log = Log(user.user_id, self.staff_id, current_time, "CreateAccount", "", "")
+        log = Log(user.user_id, self.staff_id, "CreateAccount", "", "")
         db.session.add(log)
         db.session.commit()
 
@@ -185,7 +185,7 @@ class UpdateUserController(object):
             operation_type = "ChangeUsername"
             data_field = '{"old":%s , "new":%s}' % (user.username, username)
             modification = 'Username Changed: from %s to %s' % (user.username, username)
-            log = Log(self.user_id, self.staff_id, current_time, operation_type, data_field, modification)
+            log = Log(self.user_id, self.staff_id, operation_type, data_field, modification)
             db.session.add(log)
             db.session.commit()
         if password == "":
@@ -194,7 +194,7 @@ class UpdateUserController(object):
             operation_type = "ChangePassword"
             data_field = ""
             modification = ""
-            log = Log(self.user_id, self.staff_id, current_time, operation_type, data_field, modification)
+            log = Log(self.user_id, self.staff_id, operation_type, data_field, modification)
             db.session.add(log)
             db.session.commit()
 
@@ -204,7 +204,7 @@ class UpdateUserController(object):
             operation_type = "ChangeMemo"
             data_field = '{"old":%s , "new":%s}' % (user.memo, memo)
             modification = 'Memo Changed from: %s to %s' % (user.memo, memo)
-            log = Log(self.user_id, self.staff_id, current_time, operation_type, data_field, modification)
+            log = Log(self.user_id, self.staff_id, operation_type, data_field, modification)
             db.session.add(log)
             db.session.commit()
 
@@ -215,7 +215,7 @@ class UpdateUserController(object):
                 operation_type = "ChangeExpireTime"
                 data_field = '{"old":%s , "new":%s}' % (str(user.expire_time),str(expire_time))
                 modification = 'Expire time Changed from: %s to %s' % (str(user.expire_time), str(expire_time))
-                log = Log(self.user_id, self.staff_id, current_time, operation_type, data_field, modification)
+                log = Log(self.user_id, self.staff_id, operation_type, data_field, modification)
                 db.session.add(log)
                 db.session.commit()
 
@@ -244,7 +244,7 @@ class UpdateUserController(object):
 
                     data_field = '{"symbol":%s, "start":%s, "end":%s }' % (item["symbol"], str(item["start_time"]), str(item["end_time"]))
                     modification = 'Entitlement Changed:%s. Valid from %s to %s' % (item["symbol"], str(item["start_time"]), str(item["end_time"]))
-                    log = Log(self.user_id, self.staff_id, current_time, operation_type, data_field, modification)
+                    log = Log(self.user_id, self.staff_id, operation_type, data_field, modification)
                     db.session.add(log)
                     db.session.commit()
 
@@ -257,7 +257,7 @@ class UpdateUserController(object):
 
                 data_field = '{"symbol":%s, "start":%s, "end":%s }' % (item["symbol"], str(item["start_time"]), str(item["end_time"]))
                 modification = 'Entitlement Added: %s. Valid from %s to %s' % (item["symbol"], str(item["start_time"]), str(item["end_time"]))
-                log = Log(self.user_id, self.staff_id, current_time, operation_type, data_field, modification)
+                log = Log(self.user_id, self.staff_id, operation_type, data_field, modification)
                 db.session.add(log)
                 db.session.commit()
             else:
@@ -271,14 +271,14 @@ class UpdateUserController(object):
                 operation_type = "DeleteEntitlement"
                 data_field = ""
                 modification = "Entitlement Deleted: %s" % (str(item["symbol"]))
-                log = Log(self.user_id, self.staff_id, current_time, operation_type, data_field, modification)
+                log = Log(self.user_id, self.staff_id, operation_type, data_field, modification)
                 db.session.add(log)
                 db.session.commit()
         return True
 
 
 # add new admin
-def new_user(username, password, apiKey):
-    user=Admin(username,password,apiKey)
+def new_user(username, password,  apiKey):
+    user = Admin(username, password, apiKey)
     db.session.add(user)
     db.session.commit()

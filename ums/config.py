@@ -1,9 +1,11 @@
 # -*- coding:utf-8 -*-
-__author__ = 'ty'
+import os
+
+BASE_DIR = os.path.abspath(os.path.join(__file__, '..', '..'))
 
 
 class BaseConfig(object):
     CSRF_ENABLED = True
-    SECRET_KEY = 'you-will-never-guess'
-    SQLALCHEMY_DATABASE_URI ='mysql+mysqlconnector://root:12345678@localhost:3306/test'
+    SECRET_KEY = 'Qn5748h#UgLc1eR*0v'
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///%s/carbin' % BASE_DIR
     SQLALCHEMY_TRACK_MODIFICATIONS = False
