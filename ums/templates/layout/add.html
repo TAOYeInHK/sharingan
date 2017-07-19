@@ -1,55 +1,23 @@
-<!DOCTYPE html>
-{% extends "master_base.html" %}
+{% extends "base.html" %}
 {% block content %}
-<script src="https://cdn.bootcss.com/knockout/3.4.2/knockout-min.js"></script>
-<div class="container">
-    <div class="row">
-        <div id="maincontent" class="span8">
-            <div class="tabbable">
-                <div class="tab-content">
-				      <div id="demo" class="tab-pane active">
-                          <form action="" id="contact-form" method="post" class="form-horizontal">
-                              <fieldset>
-                                  <legend>new user information form</legend>
-                                  <div style="width: 50%">
-                                      <div class="control-group">
-                                      <label class="control-label" for="username">username</label>
-                                      <div class="controls">
-                                          <input type="text" class="form-control" name="username" id="username" data-bind="value: username">
-                                      </div>
-                                      <label class="control-label" for="password">password</label>
-                                      <div class="controls">
-                                          <input type="text" class="form-control" name="password" id="password" data-bind="value: password">
-                                          <a href="#" data-bind="click: randomPassword">generate</a>
-                                      </div>
-                                      <label class="control-label" for="memo">memo</label>
-                                      <div class="controls">
-                                          <input type="text" class="form-control" name="memo" id="memo" data-bind="value: memo">
-                                      </div>
-                                      <label class="control-label" for="expire_time">expire time</label>
-                                      <div class="controls">
-                                          <input type="date" class="form-control" name="expire_time" id="expire_time" data-bind="value: expire_time">
-                                      </div>
-                                  </div>
-                                  </div>
-                                  <div style="padding-top: 20px">
-                                      <div class="form-actions">
-                                      <button class="btn btn-primary btn-large" data-bind="click: submit">submit</button>
-                                      <button type="reset" class="btn">cancel</button>
-                                  </div>
-                                  </div>
-
-
-                              </fieldset>
-                          </form>
-                      </div><!-- .tab-pane -->
-                </div><!-- .tab-content -->
-            </div><!-- .tabbable -->
-        </div><!-- .span -->
-    </div><!-- .row -->
-</div> <!-- .container -->
-<div style="text-align:center;clear:both">
-</div>
-<script type="text/javascript" src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
-<script type="text/javascript" src="../../static/addUser.js"></script>
+<form action="/user/" method="post">
+    {{ form.csrf_token }}
+    <div class="form-group">
+        {{ form.username.label }}<br />
+        {{ form.username(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.password.label }}<br />
+        {{ form.password(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.memo.label }}<br />
+        {{ form.memo(class="form-control") }}
+    </div>
+    <div class="form-group">
+        {{ form.expire_time.label }}<br />
+        {{ form.expire_time(class="form-control datetimeinput", type="datetime-local") }}
+    </div>
+    <input class="btn btn-default" type="submit" value="提交">
+</form>
 {% endblock %}

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-{% extends "master_beforelogin.html" %}
+{% extends "base.html" %}
 {% block content %}
 <div class="container">
     <div class="row">
@@ -12,11 +12,11 @@
                 {{ form.csrf_token }}
                 <div class="form-group">
                     {{ form.username.label }}<br />
-                    {{ form.username(class_="form-control") }}
+                    {{ form.username(class="form-control") }}
                 </div>
                 <div class="form-group">
                     {{ form.password.label }}<br />
-                    {{ form.password(class_="form-control") }}
+                    {{ form.password(class="form-control") }}
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">Sign In</button>
             </form>

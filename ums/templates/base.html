@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{title}}</title>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.bootcss.com/bootstrap-table/1.11.1/bootstrap-table.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container">
+    <nav class="navbar navbar-default sidebar" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">My Company</a>
+            </div>
+            {% if current_user.is_authenticated %}
+            <div class="collapse navbar-collapse">
+                <ul class="nav navbar-right top-nav">
+                    <li><a href="/logout">登出</a></li>
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </nav>
+    <div class="row">
+        {% if current_user.is_authenticated %}
+        <div class="col-sm-4 col-md-3 sidebar">
+            <div class="mini-submenu">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </div>
+            <div class="list-group">
+                <span class="list-group-item active">
+                    Submenu
+                    <span class="pull-right" id="slide-submenu">
+                        <i class="fa fa-times"></i>
+                    </span>
+                </span>
+                <a href="/" class="list-group-item">
+                    <i class="fa fa-comment-o"></i> 首页
+                </a>
+                <a href="/user/list" class="list-group-item">
+                    <i class="fa fa-comment-o"></i> 用户列表
+                </a>
+                <a href="/user/" class="list-group-item">
+                    <i class="fa fa-search"></i> 添加用户
+                </a>
+            </div>
+        </div>
+        {% endif %}
+        <div class="col-xs-12 col-sm-9">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</div>
+</body>
+<script src="https://cdn.bootcss.com/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="https://cdn.bootcss.com/bootstrap-table/1.11.1/bootstrap-table.min.js"></script>
+<script src="https://cdn.bootcss.com/knockout/3.4.2/knockout-min.js"></script>
+<script src="https://cdn.bootcss.com/respond.js/1.4.2/respond.min.js"></script>
+<script src="https://cdn.bootcss.com/html5shiv/r29/html5.min.js"></script>
+</html>

@@ -1,27 +1,26 @@
 # -*- coding:utf-8 -*-
 from contextlib import contextmanager
 
-from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 
 from ums import app
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 Session = db.sessionmaker()
+Session.configure(bind=db.engine)
 
 
 @contextmanager
-def session_scope(**kwargs):
-    """Provide a transactional scope around a series of operations."""
-    external_session = kwargs.pop('session', None)
-    session = external_session or Session(**kwargs)
+def session_scope():
+    session = Session()
     try:
         yield session
-        external_session or session.commit()
+        session.commit()
     except:
-        external_session or session.rollback()
+        session.rollback()
         raise
     finally:
-        external_session or session.close()
+        session.close()
 

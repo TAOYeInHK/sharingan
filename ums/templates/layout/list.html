@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="fixed-table-toolbar">
+        <div class="pull-right search"><input class="form-control" type="text" placeholder="Search"></div>
+    </div>
+    <table class="table table-bordered" data-toggle="table" data-url="/users/" data-pagination="true" data-side-pagination="server">
+        <thead>
+        <tr>
+            <th data-field="username">用户名</th>
+            <th data-field="expire_time">过期时间</th>
+        </tr>
+        </thead>
+    </table>
+{% endblock %}
