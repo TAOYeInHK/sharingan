@@ -20,13 +20,14 @@ class Admin(db.Model, UserMixin):
         self.api_key = apiKey
 
 
-records = db.Table(
-    'records',
-    db.Column('user_id', db.Integer, db.ForeignKey('user.id')),
-    db.Column('entitle_id', db.Integer, db.ForeignKey('entitlement.id')),
-    db.Column('start_time', db.DateTime),
-    db.Column('end_time', db.DateTime),
-)
+class UserEntitlement(db.Model):
+    __tablename__ = 'user_entitlement'
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    entitlement_id = db.Column(db.Integer, db.ForeignKey('entitlement.id'), primary_key=True)
+    start_time = db.Column(db.DateTime)
+    end_time = db.Column(db.DateTime)
+    user = db.relationship('User', back_populates='entitlements')
+    entitlement = db.relationship('Entitlement', back_populates='users')
 
 
 class User(db.Model, UserMixin):
@@ -37,8 +38,7 @@ class User(db.Model, UserMixin):
     memo = db.Column(db.String(1000))
     expire_time = db.Column(db.DateTime)
     entitlements = db.relationship(
-        'Entitlement', secondary=records,
-        backref=db.backref('users', lazy='dynamic')
+        'UserEntitlement', back_populates='user'
     )
 
     def __init__(self, username, password, memo, expire_time):
@@ -46,6 +46,12 @@ class User(db.Model, UserMixin):
         self.password = password
         self.memo = memo
         self.expire_time = expire_time
+
+    def __unicode__(self):
+        return '[{}]{}'.format(self.id, self.username)
+
+    def __str__(self):
+        return '[{}]{}'.format(self.id, self.username)
 
     def to_json(self):
         return [{
@@ -59,12 +65,18 @@ class Entitlement(db.Model):
     __tablename__ = 'entitlement'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(100))
+    users = db.relationship(
+        'UserEntitlement', back_populates='entitlement'
+    )
 
-    def __init__(self, user_id, entitlement, start_time, end_time):
-        self.user_id = user_id
-        self.entitlement = entitlement
-        self.start_time = start_time
-        self.end_time = end_time
+    def __init__(self, name):
+        self.name = name
+
+    def __unicode__(self):
+        return '[{}]{}'.format(self.id, self.name)
+
+    def __str__(self):
+        return '[{}]{}'.format(self.id, self.name)
 
 
 class Log(db.Model):

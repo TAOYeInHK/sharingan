@@ -2,6 +2,17 @@
  * Created by ty on 2015/5/4.
  */
 
+$(function () {
+   $('#records-add-row').click(function () {
+       var $record_ul = $('#record');
+       var $last_li = $($record_ul.children().slice(-1)[0]);
+       var index = parseInt($('table', $last_li).attr('id').split('-')[1]);
+       var $new_li = $last_li.clone();
+       $record_ul.append($new_li);
+
+   })
+});
+
 function addUserViewModel () {
     self.username = ko.observable("");
     self.password = ko.observable("");

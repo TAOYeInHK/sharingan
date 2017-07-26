@@ -7,8 +7,8 @@ from flask_login import login_required, logout_user, current_user, login_user
 from ums import app
 from ums.controller import UpdateUserController, GetOneUserController
 from ums.database import session_scope
-from ums.models import Admin, User
-from ums.forms import LoginForm, RegistrationForm
+from ums.models import Admin, User, Entitlement
+from ums.forms import LoginForm, UserForm, EntitlementForm
 
 
 @app.before_request
@@ -23,7 +23,7 @@ def login_input():
 
     form = LoginForm(request.form)
     if request.method == 'GET':
-        return render_template('/layout/login.html', form=form)
+        return render_template('login.html', form=form)
     if not form.validate_on_submit():
         return redirect('/')
     admin = Admin.query.filter_by(username=form.username.data).first()
@@ -45,13 +45,13 @@ def logout():
 @app.route('/', methods=['GET'])
 @login_required
 def home():
-    return render_template('/layout/home.html')
+    return render_template('home.html')
 
 
 @app.route('/user/list', methods=['GET'])
 @login_required
-def user_list():
-    return render_template('/layout/list.html')
+def show_user_list():
+    return render_template('user/list.html')
 
 
 @app.route('/users/', methods=['GET'])
@@ -71,15 +71,15 @@ def get_user_list():
         } for user in users]})
 
 
-@app.route("/user/<int:user_id>/", methods=['GET', 'POST'])
+@app.route('/user/<int:user_id>/', methods=['GET', 'POST'])
 @login_required
-def edit(user_id):
+def edit_user(user_id):
     if request.method == 'GET':
         getUser = GetOneUserController()
         user = getUser.get_user(user_id)
         entitlement = getUser.getUserEntitlement(user_id)
         log = getUser.getLog(user_id)
-        return render_template('/layout/edit.html', userInfo=user,
+        return render_template('user/edit.html', userInfo=user,
                                entitlementInfo=entitlement, log=log)
 
     if request.method == 'POST':
@@ -97,14 +97,58 @@ def edit(user_id):
             return redirect('/welcome/bad')
 
 
-@app.route("/user/", methods=['GET', 'POST'])
+@app.route('/user/', methods=['GET', 'POST'])
 @login_required
-def add():
-    form = RegistrationForm(request.form)
+def add_user():
+    form = UserForm(request.form)
     if request.method == 'GET':
-        return render_template('/layout/add.html', form=form)
+        return render_template('user/add.html', form=form)
+
     if not form.validate_on_submit():
-        return render_template('/layout/add.html', form=form)
+        return render_template('user/add.html', form=form)
+
+    with session_scope() as session:
+        user = User(
+            username=form.username.data, password=form.password.data,
+            memo=form.memo.data, expire_time=form.expire_time.data
+        )
+        session.add(user)
+        user.entitlements.append(*form.records.data)
+
+    return redirect('/')
+
+
+@app.route('/entitlement/list', methods=['GET'])
+@login_required
+def show_entitlement_list():
+    return render_template('entitlement/list.html')
+
+
+@app.route('/entitlements/', methods=['GET'])
+@login_required
+def get_entitlement_list():
+    offset = request.args.get('offset')
+    limit = request.args.get('limit')
+
+    with session_scope() as session:
+        query = session.query(Entitlement)
+        total = query.count()
+        entitlements = query.filter_by().limit(limit).offset(offset).all()
+
+        return jsonify({'total': total, 'rows': [{
+            'id': entitlement.id,
+            'name': entitlement.name,
+        } for entitlement in entitlements]})
+
+
+@app.route('/entitlement/', methods=['GET', 'POST'])
+@login_required
+def add_entitlement():
+    form = EntitlementForm(request.form)
+    if request.method == 'GET':
+        return render_template('entitlement/add.html', form=form)
+    if not form.validate_on_submit():
+        return render_template('entitlement/add.html', form=form)
 
     with session_scope() as session:
         user = User(
